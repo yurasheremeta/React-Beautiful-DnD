@@ -1,27 +1,51 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import data from './data/data';
+import { Column } from './components/Column/Column';
+import { DragDropContext } from 'react-beautiful-dnd';
 import './App.css';
+import styled from 'styled-components';
 
+const Container = styled.div`
+  display: flex;
+`
 class App extends Component {
+   state = data;
+
+  onDragEnd = result => {
+    const { destination, source, draggableId } = result;
+
+    if (!destination) {
+      return;
+    }
+
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    const column = this.state.columns[source.droppableId];
+    const newItemsIds = Array.from(column.itemsId);
+    newItemsIds.splice(source.index, 1);
+    newItemsIds.splice(destination.index, 0, draggableId);
+  }
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
+      <DragDropContext onDragEnd={this.onDragEnd}>
+      <Container>
+        {this.state.columnOrder.map((columnId) => {
+        const column = this.state.columns[columnId];
+        // const items = column.itemsId.map((itemsId: string) => this.state.items[itemsId])
+
+        return <Column key={column.id} column={column} />;
+
+      })}
+      </Container>
+      
+    </DragDropContext>
+    
+    )
   }
 }
 
