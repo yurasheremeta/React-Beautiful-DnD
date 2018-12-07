@@ -25,18 +25,62 @@ class App extends Component {
       return;
     }
 
-    const column = this.state.columns[source.droppableId];
-    const newItemsIds = Array.from(column.itemsId);
-    newItemsIds.splice(source.index, 1);
-    newItemsIds.splice(destination.index, 0, draggableId);
+    const start = this.state.columns[source.droppableId];
+    const finish = this.state.columns[destination.droppableId];
+
+    if (start === finish){
+      const newItemsIds = Array.from(start.itemsId);
+      newItemsIds.splice(source.index, 1);
+      newItemsIds.splice(destination.index, 0, draggableId);
+      
+      const newColumn = {
+        ...start,
+        itemsIds: newItemsIds,
+      };
+
+      const newState = {
+        ...this.state,
+        columns: {
+          ...this.state.columns,
+          [newColumn.id]: newColumn
+        },
+      };
+
+      this.setState(newState);
+      return;
+    }
+
+   const startItemsIds = Array.from(start.itemsIds);
+   startItemsIds.splice(source.index, 1);
+   const newStart = {
+     ...start,
+     itemsIds: startItemsIds,
+   };
+
+   const finishItemsIds = Array.from(finish.itemsId);
+   finishItemsIds.splice(destination.index , 0 , draggableId);
+   const newFinish = {
+     ...finish,
+     itemsIds: finishItemsIds
+   };
+
+   const newState = {
+     ...this.state,
+     columns: {
+       ...this.state.columns,
+       [newStart.id]: newStart,
+       [newFinish.id]: newFinish,
+     }
+   }
+   this.setState(newState);
   }
   render() {
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
       <Container>
-        {this.state.columnOrder.map((columnId) => {
+        {this.stae.columnOrder.map((columnId) => {
         const column = this.state.columns[columnId];
-        // const items = column.itemsId.map((itemsId: string) => this.state.items[itemsId])
+        // const items = column.itemsId.map((itemsId) => this.state.items[itemsId])
 
         return <Column key={column.id} column={column} />;
 
